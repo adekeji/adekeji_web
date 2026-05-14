@@ -1,16 +1,592 @@
 
 <!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Web of Things</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg-1: #ff7a18;
+			--bg-2: #00c6ff;
+			--bg-3: #f9f871;
+			--ink: #14213d;
+			--card: rgba(255, 255, 255, 0.85);
+			--card-strong: #ffffff;
+			--accent: #ef476f;
+			--accent-2: #06d6a0;
+			--accent-3: #118ab2;
+			--shadow: 0 20px 40px rgba(20, 33, 61, 0.18);
+			--radius: 20px;
+		}
 
-<html>
+		body.theme-night {
+			--bg-1: #1d3557;
+			--bg-2: #457b9d;
+			--bg-3: #a8dadc;
+			--ink: #f1faee;
+			--card: rgba(15, 23, 42, 0.8);
+			--card-strong: rgba(22, 33, 62, 0.92);
+			--accent: #f4a261;
+			--accent-2: #2a9d8f;
+			--accent-3: #90e0ef;
+			--shadow: 0 20px 40px rgba(5, 8, 16, 0.35);
+		}
 
-<body bgcolor="#3A8F80">
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
 
-<font color=White size=14 face=Verdana>Michael's Web of Things</font>
+		body {
+			min-height: 100vh;
+			font-family: "Space Grotesk", "Trebuchet MS", "Segoe UI", sans-serif;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.35) 0 12%, transparent 13%),
+				radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.3) 0 10%, transparent 11%),
+				linear-gradient(120deg, var(--bg-1), var(--bg-2) 48%, var(--bg-3));
+			background-attachment: fixed;
+			overflow-x: hidden;
+		}
 
-<br/>
+		.wrap {
+			width: min(1150px, 92vw);
+			margin: 0 auto;
+			padding: 28px 0 50px;
+			display: grid;
+			gap: 18px;
+		}
 
-<img src=https://cdn.pixabay.com/photo/2015/12/01/20/28/road-1072823_960_720.jpg height=100% width=100% >
+		.hero {
+			position: relative;
+			background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.8));
+			border-radius: calc(var(--radius) + 8px);
+			padding: 26px;
+			box-shadow: var(--shadow);
+			isolation: isolate;
+			overflow: hidden;
+			animation: rise-in 650ms ease both;
+		}
 
+		.hero::after {
+			content: "";
+			position: absolute;
+			inset: auto -40px -50px auto;
+			width: 220px;
+			height: 220px;
+			border-radius: 999px;
+			background: linear-gradient(145deg, rgba(17, 138, 178, 0.35), rgba(239, 71, 111, 0.45));
+			z-index: -1;
+			filter: blur(1px);
+		}
+
+		.title {
+			font-family: "Bebas Neue", Impact, sans-serif;
+			letter-spacing: 1.5px;
+			font-size: clamp(2.1rem, 6vw, 4.2rem);
+			line-height: 0.95;
+			margin-bottom: 8px;
+			text-transform: uppercase;
+		}
+
+		.subtitle {
+			max-width: 700px;
+			font-size: clamp(1rem, 2.3vw, 1.22rem);
+			opacity: 0.92;
+			margin-bottom: 16px;
+		}
+
+		.hero-meta {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.pill {
+			background: #fff;
+			border: 2px solid rgba(20, 33, 61, 0.1);
+			border-radius: 999px;
+			padding: 8px 14px;
+			font-weight: 600;
+			font-size: 0.92rem;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1.2fr 0.8fr;
+			gap: 16px;
+		}
+
+		.panel {
+			background: var(--card);
+			border: 2px solid rgba(255, 255, 255, 0.45);
+			border-radius: var(--radius);
+			padding: 18px;
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(3px);
+			animation: rise-in 750ms ease both;
+		}
+
+		.panel h2 {
+			font-size: 1.2rem;
+			margin-bottom: 12px;
+		}
+
+		.focus-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 10px;
+		}
+
+		.focus-card {
+			background: var(--card-strong);
+			border-radius: 14px;
+			border: 2px solid rgba(17, 138, 178, 0.15);
+			padding: 12px;
+			min-height: 115px;
+			transition: transform 220ms ease, box-shadow 220ms ease;
+		}
+
+		.focus-card:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 10px 20px rgba(17, 138, 178, 0.15);
+		}
+
+		.focus-card h3 {
+			font-size: 0.98rem;
+			margin-bottom: 8px;
+			color: var(--accent-3);
+		}
+
+		.focus-card p {
+			font-size: 0.92rem;
+			line-height: 1.4;
+		}
+
+		.todo-form {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			gap: 8px;
+			margin-bottom: 12px;
+		}
+
+		.input,
+		.btn {
+			border: 2px solid rgba(20, 33, 61, 0.16);
+			border-radius: 12px;
+			padding: 10px 12px;
+			font: inherit;
+		}
+
+		.input:focus {
+			outline: none;
+			border-color: var(--accent-3);
+			box-shadow: 0 0 0 4px rgba(17, 138, 178, 0.18);
+		}
+
+		.btn {
+			font-weight: 700;
+			cursor: pointer;
+			background: linear-gradient(120deg, var(--accent), #ff7f50);
+			color: #fff;
+			border-color: transparent;
+		}
+
+		.btn:hover {
+			filter: brightness(1.05);
+		}
+
+		.todo-list {
+			list-style: none;
+			display: grid;
+			gap: 8px;
+			max-height: 260px;
+			overflow-y: auto;
+			padding-right: 4px;
+		}
+
+		.todo-item {
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+			gap: 8px;
+			align-items: center;
+			padding: 9px 10px;
+			border-radius: 10px;
+			background: #fff;
+			border: 1px solid rgba(20, 33, 61, 0.1);
+		}
+
+		.todo-item.done span {
+			text-decoration: line-through;
+			opacity: 0.6;
+		}
+
+		.icon-btn {
+			border: none;
+			background: #f1f7ff;
+			color: #0e4f72;
+			width: 28px;
+			height: 28px;
+			border-radius: 999px;
+			cursor: pointer;
+			font-weight: 700;
+		}
+
+		.icon-btn.danger {
+			background: #ffe5ea;
+			color: #9d153a;
+		}
+
+		.quick-links {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+			margin-top: 12px;
+		}
+
+		.quick-link {
+			text-decoration: none;
+			color: inherit;
+			border-radius: 12px;
+			padding: 12px;
+			font-weight: 600;
+			border: 2px solid rgba(20, 33, 61, 0.1);
+			background: #fff;
+			transition: transform 200ms ease;
+		}
+
+		body.theme-night .quick-link,
+		body.theme-night .focus-card,
+		body.theme-night .todo-item,
+		body.theme-night .stat,
+		body.theme-night .pill {
+			background: rgba(255, 255, 255, 0.12);
+			border-color: rgba(255, 255, 255, 0.24);
+		}
+
+		body.theme-night .icon-btn {
+			background: rgba(144, 224, 239, 0.25);
+			color: #f1faee;
+		}
+
+		body.theme-night .icon-btn.danger {
+			background: rgba(239, 71, 111, 0.25);
+			color: #ffd6de;
+		}
+
+		.controls {
+			display: flex;
+			gap: 10px;
+			margin-top: 14px;
+			flex-wrap: wrap;
+		}
+
+		.btn-ghost {
+			border: 2px solid rgba(20, 33, 61, 0.2);
+			background: rgba(255, 255, 255, 0.7);
+			color: inherit;
+			padding: 8px 12px;
+			border-radius: 12px;
+			font: inherit;
+			font-weight: 700;
+			cursor: pointer;
+		}
+
+		body.theme-night .btn-ghost {
+			border-color: rgba(255, 255, 255, 0.35);
+			background: rgba(255, 255, 255, 0.14);
+		}
+
+		.quick-link:hover {
+			transform: translateY(-3px);
+		}
+
+		.stats {
+			margin-top: 12px;
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+
+		.stat {
+			padding: 8px 12px;
+			border-radius: 10px;
+			background: #fff;
+			border: 1px solid rgba(20, 33, 61, 0.12);
+			font-weight: 700;
+			font-size: 0.9rem;
+		}
+
+		footer {
+			text-align: center;
+			font-size: 0.9rem;
+			opacity: 0.9;
+			padding: 6px 0 2px;
+		}
+
+		@keyframes rise-in {
+			from {
+				opacity: 0;
+				transform: translateY(16px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@media (max-width: 900px) {
+			.grid {
+				grid-template-columns: 1fr;
+			}
+
+			.focus-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="wrap">
+		<section class="hero">
+			<h1 class="title">Michael's Web of Things</h1>
+			<p class="subtitle">A colorful home base for your day: capture tasks, stay focused, and jump to what matters fast.</p>
+			<div class="hero-meta">
+				<span class="pill" id="todayDate">Loading date...</span>
+				<span class="pill" id="liveClock">--:--:--</span>
+				<span class="pill">Theme: Sunrise Spark</span>
+			</div>
+			<div class="controls">
+				<button type="button" class="btn-ghost" id="themeToggle">Switch Theme</button>
+				<button type="button" class="btn-ghost" id="editLinks">Edit Quick Links</button>
+			</div>
+		</section>
+
+		<section class="grid">
+			<article class="panel">
+				<h2>Daily Focus</h2>
+				<div class="focus-grid">
+					<section class="focus-card">
+						<h3>Top Goal</h3>
+						<p>Pick one meaningful outcome you want complete before the day ends.</p>
+					</section>
+					<section class="focus-card">
+						<h3>Energy Check</h3>
+						<p>Plan hard tasks during your best hours and easier tasks later.</p>
+					</section>
+					<section class="focus-card">
+						<h3>Reset Ritual</h3>
+						<p>Take a 5-minute break every hour: walk, hydrate, and breathe.</p>
+					</section>
+				</div>
+
+				<div class="quick-links" id="quickLinks"></div>
+			</article>
+
+			<aside class="panel">
+				<h2>Task List</h2>
+				<form id="todoForm" class="todo-form">
+					<input class="input" id="todoInput" type="text" placeholder="Add a task..." maxlength="120" required>
+					<button class="btn" type="submit">Add</button>
+				</form>
+				<ul id="todoList" class="todo-list" aria-live="polite"></ul>
+				<div class="stats">
+					<div class="stat" id="totalStat">Total: 0</div>
+					<div class="stat" id="doneStat">Done: 0</div>
+					<div class="stat" id="leftStat">Left: 0</div>
+				</div>
+			</aside>
+		</section>
+
+		<footer>Built with color, motion, and utility.</footer>
+	</main>
+
+	<script>
+		const dateEl = document.getElementById("todayDate");
+		const clockEl = document.getElementById("liveClock");
+		const todoForm = document.getElementById("todoForm");
+		const todoInput = document.getElementById("todoInput");
+		const todoList = document.getElementById("todoList");
+		const totalStat = document.getElementById("totalStat");
+		const doneStat = document.getElementById("doneStat");
+		const leftStat = document.getElementById("leftStat");
+		const quickLinksEl = document.getElementById("quickLinks");
+		const themeToggle = document.getElementById("themeToggle");
+		const editLinks = document.getElementById("editLinks");
+
+		const storageKey = "webOfThings.todos";
+		const linksStorageKey = "webOfThings.links";
+		const themeStorageKey = "webOfThings.theme";
+		const todos = JSON.parse(localStorage.getItem(storageKey) || "[]");
+		const defaultLinks = [
+			{ label: "Open Gmail", href: "https://mail.google.com" },
+			{ label: "Open Calendar", href: "https://calendar.google.com" },
+			{ label: "Open GitHub", href: "https://github.com" },
+			{ label: "Open Notion", href: "https://www.notion.so" }
+		];
+		let quickLinks = JSON.parse(localStorage.getItem(linksStorageKey) || "null") || defaultLinks;
+
+		function saveTodos() {
+			localStorage.setItem(storageKey, JSON.stringify(todos));
+		}
+
+		function saveLinks() {
+			localStorage.setItem(linksStorageKey, JSON.stringify(quickLinks));
+		}
+
+		function formatDate(now) {
+			return new Intl.DateTimeFormat("en-US", {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				year: "numeric"
+			}).format(now);
+		}
+
+		function tickClock() {
+			const now = new Date();
+			dateEl.textContent = formatDate(now);
+			clockEl.textContent = now.toLocaleTimeString();
+		}
+
+		function updateStats() {
+			const done = todos.filter((t) => t.done).length;
+			totalStat.textContent = `Total: ${todos.length}`;
+			doneStat.textContent = `Done: ${done}`;
+			leftStat.textContent = `Left: ${todos.length - done}`;
+		}
+
+		function renderQuickLinks() {
+			quickLinksEl.innerHTML = "";
+
+			quickLinks.forEach((link) => {
+				const a = document.createElement("a");
+				a.className = "quick-link";
+				a.target = "_blank";
+				a.rel = "noopener";
+				a.href = link.href;
+				a.textContent = link.label;
+				quickLinksEl.append(a);
+			});
+		}
+
+		function normalizeUrl(url) {
+			if (!url) {
+				return "";
+			}
+
+			if (url.startsWith("http://") || url.startsWith("https://")) {
+				return url;
+			}
+
+			return `https://${url}`;
+		}
+
+		function applyTheme(themeName) {
+			const night = themeName === "night";
+			document.body.classList.toggle("theme-night", night);
+			localStorage.setItem(themeStorageKey, night ? "night" : "sunrise");
+		}
+
+		function renderTodos() {
+			todoList.innerHTML = "";
+
+			todos.forEach((todo, index) => {
+				const li = document.createElement("li");
+				li.className = `todo-item${todo.done ? " done" : ""}`;
+
+				const check = document.createElement("button");
+				check.className = "icon-btn";
+				check.type = "button";
+				check.textContent = todo.done ? "✓" : "○";
+				check.setAttribute("aria-label", "Toggle task done");
+				check.addEventListener("click", () => {
+					todos[index].done = !todos[index].done;
+					saveTodos();
+					renderTodos();
+				});
+
+				const text = document.createElement("span");
+				text.textContent = todo.text;
+
+				const del = document.createElement("button");
+				del.className = "icon-btn danger";
+				del.type = "button";
+				del.textContent = "x";
+				del.setAttribute("aria-label", "Delete task");
+				del.addEventListener("click", () => {
+					todos.splice(index, 1);
+					saveTodos();
+					renderTodos();
+				});
+
+				li.append(check, text, del);
+				todoList.append(li);
+			});
+
+			updateStats();
+		}
+
+		todoForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			const text = todoInput.value.trim();
+
+			if (!text) {
+				return;
+			}
+
+			todos.unshift({ text, done: false });
+			todoInput.value = "";
+			saveTodos();
+			renderTodos();
+		});
+
+		themeToggle.addEventListener("click", () => {
+			const current = localStorage.getItem(themeStorageKey) || "sunrise";
+			applyTheme(current === "sunrise" ? "night" : "sunrise");
+		});
+
+		editLinks.addEventListener("click", () => {
+			const current = JSON.stringify(quickLinks, null, 2);
+			const next = prompt("Edit quick links as JSON array of {label, href}:", current);
+
+			if (next === null) {
+				return;
+			}
+
+			try {
+				const parsed = JSON.parse(next);
+
+				if (!Array.isArray(parsed) || parsed.length === 0) {
+					throw new Error("Expected a non-empty array.");
+				}
+
+				quickLinks = parsed.map((item) => ({
+					label: String(item.label || "Link").trim() || "Link",
+					href: normalizeUrl(String(item.href || "").trim())
+				})).filter((item) => item.href);
+
+				if (!quickLinks.length) {
+					throw new Error("At least one valid link is required.");
+				}
+
+				saveLinks();
+				renderQuickLinks();
+			} catch (error) {
+				alert("Invalid JSON format for links. Keep it as an array with label and href fields.");
+			}
+		});
+
+		applyTheme(localStorage.getItem(themeStorageKey) || "sunrise");
+		tickClock();
+		setInterval(tickClock, 1000);
+		renderQuickLinks();
+		renderTodos();
+	</script>
 </body>
-
 </html>
